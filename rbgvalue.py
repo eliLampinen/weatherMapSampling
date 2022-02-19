@@ -1,4 +1,3 @@
-from unittest import result
 from PIL import Image
 import requests
 from datetime import datetime, timedelta
@@ -11,7 +10,7 @@ def getURL():
     stringDate = stringDate.split(".")[0][:-3].replace("-", "").replace(" ", "").replace(":", "")
     print(stringDate)
     minutes = int(stringDate[-2:])
-
+    
     if minutes < 19 and minutes >= 4: # New forecast/picture comes 4 minutes late
         stringDate = stringDate[:-2] + "00"
     elif minutes < 34 and minutes >= 19:
@@ -61,7 +60,9 @@ def analyzeResults(results):
         secondMostFreq = (max(set(rainArea), key = rainArea.count))
     except:
         secondMostFreq = "nothing else"
-    return mostFreq, secondMostFreq
+    if secondMostFreq == "nothing else":
+        return mostFreq + " 100 % varmuudella"            
+    return f"{mostFreq} tai {secondMostFreq}"
 
 
 def getRGB():
