@@ -1,25 +1,29 @@
-import string
+from unittest import result
 from PIL import Image
 import requests
 from datetime import datetime, timedelta
 
 
 def getURL():
-    lastHourDateTime = datetime.now() - timedelta(hours = 2)
-    stringDate = str(lastHourDateTime)
+    fmiTime = datetime.now() - timedelta(hours = 2) # Different timezone
+    stringDate = str(fmiTime)
     print(stringDate)
     stringDate = stringDate.split(".")[0][:-3].replace("-", "").replace(" ", "").replace(":", "")
     print(stringDate)
-    print(stringDate[-2:])
+    minutes = int(stringDate[-2:])
 
-    if int(stringDate[-2:]) < 19 and int(stringDate[-2:]) > 4: # New forecast/picture comes 4 minutes late
+    if minutes < 19 and minutes >= 4: # New forecast/picture comes 4 minutes late
         stringDate = stringDate[:-2] + "00"
-    elif int(stringDate[-2:]) < 34 and int(stringDate[-2:]) >= 19:
+    elif minutes < 34 and minutes >= 19:
         stringDate = stringDate[:-2] + "15"
-    elif int(stringDate[-2:]) < 49 and int(stringDate[-2:]) >= 34:
+    elif minutes < 49 and minutes >= 34:
         stringDate = stringDate[:-2] + "30"
-    elif int(stringDate[-2:]) >= 49:
+    elif minutes >= 49: 
         stringDate = stringDate[:-2] + "45"
+    elif minutes <= 3:
+        stringDate = stringDate[:-2] + "45"
+        stringDate = stringDate[:9] + str(int(stringDate[9])-1) + stringDate[10:]
+
 
     URL = "https://cdn.fmi.fi/weather-radar/observations/flash/keski-suomi_500x500/HAV_" + stringDate + "_DBZ.png"
     print(URL)
@@ -31,8 +35,8 @@ def getURL():
 def rgbOfPixel(picuture, x, y):
     pic = Image.open(picuture).convert('RGB')
     r, g, b = pic.getpixel((x, y))
-    a = (r, g, b)
-    return a
+    rgb = (r, g, b)
+    return rgb
 
 
 def getPicture(URL):
@@ -52,7 +56,12 @@ def analyzeResults(results):
                 rainArea.append(k)
 
     mostFreq = (max(set(rainArea), key = rainArea.count))
-    return mostFreq
+    rainArea = [i for i in rainArea if i != mostFreq]
+    try:
+        secondMostFreq = (max(set(rainArea), key = rainArea.count))
+    except:
+        secondMostFreq = "nothing else"
+    return mostFreq, secondMostFreq
 
 
 def getRGB():
@@ -66,7 +75,7 @@ def getRGB():
 
 getPicture(getURL())
 results = getRGB()
-print(analyzeResults(results))
-
+results = analyzeResults(results)
+print(results)
 
 colorsBar = [(0, 118, 200), (6, 193, 162), (107, 176, 15), (182, 182, 12), (196, 154, 0), (182, 18, 0), (182, 23, 12)] # Heikosta rankkaan
