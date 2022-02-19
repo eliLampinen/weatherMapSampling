@@ -10,7 +10,7 @@ def getURL():
     stringDate = stringDate.split(".")[0][:-3].replace("-", "").replace(" ", "").replace(":", "")
     print(stringDate)
     minutes = int(stringDate[-2:])
-    
+
     if minutes < 19 and minutes >= 4: # New forecast/picture comes 4 minutes late
         stringDate = stringDate[:-2] + "00"
     elif minutes < 34 and minutes >= 19:
@@ -47,7 +47,7 @@ def getPicture(URL):
 
 def analyzeResults(results):
     rainArea = []
-    colorsAlppila = {"heikkoa sadetta": (74, 143, 186), "kohtalaista sadetta": (71, 175, 152), "ei sadetta": (185, 124, 122)}
+    colorsAlppila = {"light rain": (74, 143, 186), "light to moderate rain": (71, 175, 152), "moderate": (156, 190, 57), "no rain": (185, 124, 122)}
     
     for i in results:
         for k, v in colorsAlppila.items():
@@ -61,8 +61,8 @@ def analyzeResults(results):
     except:
         secondMostFreq = "nothing else"
     if secondMostFreq == "nothing else":
-        return mostFreq + " 100 % varmuudella"            
-    return f"{mostFreq} tai {secondMostFreq}"
+        return mostFreq + " with 100 % certainty"            
+    return f"{mostFreq} or {secondMostFreq}"
 
 
 def getRGB():
